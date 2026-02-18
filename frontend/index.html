@@ -447,4 +447,52 @@
                 .catch(error => console.error('Error loading revenue chart:', error));
         }
         
+        // Load trips table using custom sorting
+        function loadTripsTable(borough = '') {
+            const tbody = document.getElementById('trips-tbody');
+            tbody.innerHTML = '<tr><td colspan="5" class="loading">Loading...</td></tr>';
+            
+            // Use our custom sorting endpoint
+            let url = API_BASE + '/trips/custom-sort?sort_by=total_amount&limit=20';
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(result => {
+                    const trips = result.data || [];
+                    tbody.innerHTML = '';
+                    
+                    if (trips.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="loading">No trips found</td></tr>';
+                        return;
+                    }
+                    
+                    trips.forEach(trip => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${trip.trip_id}</td>
+                            <td>${trip.pickup_time}</td>
+                            <td>${trip.trip_distance}</td>
+                            <td>$${trip.total_amount}</td>
+                            <td>${trip.speed}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading trips:', error);
+                    tbody.innerHTML = '<tr><td colspan="5" class="loading">Error loading data</td></tr>';
+                });
+        }
+        
+        // Filter functions
+        function applyFilters() {
+            const borough = document.getElementById('borough-filter').value;
+            loadTripsTable(borough);
+        }
+        
+        function resetFilters() {
+            document.getElementById('borough-filter').value = '';
+            loadTripsTable();
+        }
+        
         
