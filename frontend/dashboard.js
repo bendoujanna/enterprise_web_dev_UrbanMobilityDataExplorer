@@ -161,3 +161,67 @@ function renderSpeedChart(data) {
         }
     });
 }
+function renderHourlyChart(chartData) {
+    const ctx = document.getElementById('hourlyChart').getContext('2d');
+    updateChart('hourly', ctx, {
+        type: 'bar',
+        data: {
+            labels: chartData.map(d => d.hour),
+            datasets: [{
+                label: 'Trips per Hour',
+                data: chartData.map(d => d.trips),
+                backgroundColor: '#1e3c72'
+            }]
+        }
+    });
+}
+
+// Helper to destroy old charts before creating new ones
+function updateChart(id, ctx, config) {
+    if (charts[id]) charts[id].destroy();
+    charts[id] = new Chart(ctx, config);
+}
+
+// filters and sorting
+function setupFilters() {
+    const boroughSelect = document.getElementById('borough-filter');
+    const sortSelect = document.getElementById('sort-selector');
+
+    const triggerRefresh = () => {
+        const borough = boroughSelect.value;
+        const sortBy = sortSelect.value;
+        // Pass the values to the loader
+        loadTripsTable(borough, sortBy);
+    };
+
+    boroughSelect.addEventListener('change', triggerRefresh);
+    sortSelect.addEventListener('change', triggerRefresh);
+}
+
+// main table loader
+async function loadTripsTable(borough = '', sortBy = 'total_amount') {
+    const tbody = document.getElementById('trips-tbody');
+    tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Processing Manual Sort...</td></tr>';
+
+    //  Call API
+    const res = await API.getSortedTrips(sortBy, 100, borough);
+
+    // Render Rows
+    if (res && res.data) {
+        tbody.innerHTML = res.data.map(trip => `
+            <tr>
+                <td style="font-weight: bold; color: var(--primary-blue);">
+                    ${trip.pickup_borough || 'Unknown'}
+                </td>
+                <td>Zone ${trip.pickup_location}</td>
+                <td>Zone ${trip.dropoff_location}</td>
+                <td>$${parseFloat(trip.total_amount).toFixed(2)}</td>
+                <td>${trip.trip_distance} mi</td>
+                <td>${parseFloat(trip.speed).toFixed(1)} mph</td>
+                <td>${trip.pickup_time.split(' ')[1]}</td>
+            </tr>
+        `).join('');
+    } else {
+        tbody.innerHTML = '<tr><td colspan="7">No records found.</td></tr>';
+    }
+}
