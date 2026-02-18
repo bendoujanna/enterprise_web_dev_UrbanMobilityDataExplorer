@@ -297,3 +297,14 @@ body.dark-mode #limit-selector:hover {
     background-color: #383838;
     border-color: #64b5f6;
 }
+/* Mobile */
+@media (max-width: 1024px) {
+    body { overflow: auto; height: auto; }
+    .app-wrapper { flex-direction: column; height: auto; }
+    .sidebar { width: 100%; height: auto; padding: 1rem; flex-direction: row; align-items: center; }
+    .nav-links { flex-direction: row; margin: 0; }
+    .content { height: auto; overflow: visible; padding: 1rem; gap: 1rem; }
+    .chart-grid { grid-template-columns: 1fr; height: auto; }
+    .kpi-row { grid-template-columns: 1fr; }
+    #analytics-view .chart-card { max-width: 100%; }
+}
