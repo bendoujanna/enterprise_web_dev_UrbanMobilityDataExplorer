@@ -135,3 +135,73 @@
         .filter-group button:hover {
             background: #2a5298;
         }
+
+        /* Table */
+        .data-table {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        
+        .data-table h2 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #1e3c72;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>NYC Taxi Analytics Dashboard</h1>
+            <p>Exploring Urban Mobility Patterns - January 2019</p>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="kpi-section">
+            <div class="kpi-card">
+                <h3>Total Trips</h3>
+                <div class="value" id="total-trips">Loading...</div>
+            </div>
+            <div class="kpi-card">
+                <h3>Average Fare</h3>
+                <div class="value" id="avg-fare">Loading...</div>
+            </div>
+            <div class="kpi-card">
+                <h3>Data Quality</h3>
+                <div class="value" id="quality-score">Loading...</div>
+            </div>
+            <div class="kpi-card">
+                <h3>Total Revenue</h3>
+                <div class="value" id="total-revenue">Loading...</div>
+            </div>
+        </div>
