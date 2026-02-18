@@ -114,3 +114,50 @@ async function loadQuality() {
 //         options: { indexAxis: 'y', responsive: true }
 //     });
 // }
+function renderBoroughChart(data) {
+    const ctx = document.getElementById('boroughChart').getContext('2d');
+    updateChart('borough', ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(d => d.Borough),
+            datasets: [{
+                label: 'Trips',
+                data: data.map(d => d.trip_count),
+                backgroundColor: '#4a90e2'
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    type: 'logarithmic'
+                },
+                y: {
+                    ticks: {
+                        autoSkip: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderSpeedChart(data) {
+    const ctx = document.getElementById('speedChart').getContext('2d');
+    updateChart('speed', ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(d => d.time_of_day),
+            datasets: [{
+                label: 'Avg Speed (mph)',
+                data: data.map(d => d.avg_speed),
+                borderColor: '#1e3c72',
+                backgroundColor: 'rgba(30, 60, 114, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        }
+    });
+}
