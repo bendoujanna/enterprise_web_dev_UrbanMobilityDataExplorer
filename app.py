@@ -145,7 +145,7 @@ def get_analytics_summary():
     finally:
         conn.close()
 
-app.route('/api/stats/quality', methods=['GET'])
+@app.route('/api/stats/quality', methods=['GET'])
 def get_data_quality():
     conn = get_db_connection()
     try:
@@ -229,3 +229,156 @@ def get_data_quality():
         })
     finally:
         conn.close()
+
+
+# New endpoints using costum algorithms
+
+@app.route('/api/trips/custom-sort', methods=['GET'])
+def get_custom_sorted_trips():
+    sort_by = request.args.get('sort_by', 'total_amount')
+    limit = request.args.get('limit', 10, type=int)
+    borough = request.args.get('borough', None)  # Capture the filter
+
+    conn = get_db_connection()
+
+    # JOIN with zones to get the Borough name for the table
+    query = """
+            SELECT t.trip_id, \
+                   t.total_amount, \
+                   t.trip_distance,
+                   t.tpep_pickup_datetime, \
+                   t.PULocationID, \
+                   t.DOLocationID,
+                   t.average_speed_mph, \
+                   z.Borough
+            FROM trips t
+                     JOIN zones z ON t.PULocationID = z.LocationID
+            """
+
+    params = []
+    if borough and borough != "":
+        query += " WHERE z.Borough = ?"
+        params.append(borough)
+
+    query += " LIMIT 1000"  # Keep limit for Bubble Sort performance
+
+    results = conn.execute(query, params).fetchall()
+    conn.close()
+
+    trips_list = []
+    for row in results:
+        trips_list.append({
+            'trip_id': row['trip_id'],
+            'total_amount': row['total_amount'],
+            'trip_distance': row['trip_distance'],
+            'pickup_time': row['tpep_pickup_datetime'],
+            'pickup_location': row['PULocationID'],
+            'dropoff_location': row['DOLocationID'],
+            'speed': row['average_speed_mph'],
+            'pickup_borough': row['Borough']  # Sending the actual name
+        })
+
+    sorted_trips = sort_trips_descending(trips_list, sort_by)
+    return jsonify({"data": sorted_trips[:limit]})
+
+@app.route('/api/trips/top-expensive', methods=['GET'])
+def get_top_expensive_trips():
+    """
+    Find the most expensive trips using our custom algorithm.
+    """
+
+    n = request.args.get('n', 10, type=int)
+
+    conn = get_db_connection()
+
+    # Get data without sorting
+    trips = conn.execute("""
+                         SELECT trip_id, total_amount, trip_distance, tpep_pickup_datetime
+                         FROM trips
+                         LIMIT 5000
+                         """).fetchall()
+    conn.close()
+
+    # Convert to list
+    trips_list = []
+    for trip in trips:
+        trips_list.append({
+            'trip_id': trip['trip_id'],
+            'total_amount': trip['total_amount'],
+            'trip_distance': trip['trip_distance'],
+            'pickup_time': trip['tpep_pickup_datetime']
+        })
+
+    # Use custom function to find top N
+    top_trips = find_top_n(trips_list, 'total_amount', n)
+
+    return jsonify({
+        "message": f"Top {n} most expensive trips",
+        "algorithm_used": "Custom sorting + selection",
+        "data": top_trips
+    })
+
+
+@app.route('/api/analytics/borough-custom', methods=['GET'])
+def get_borough_stats_custom():
+    """
+    Calculate borough statistics using CUSTOM GROUPING
+    """
+
+    conn = get_db_connection()
+
+    # Get raw data without grouping in SQL
+    query = """
+            SELECT z.Borough, t.total_amount
+            FROM trips t
+                     JOIN zones z ON t.PULocationID = z.LocationID
+            LIMIT 10000 \
+            """
+
+    results = conn.execute(query).fetchall()
+    conn.close()
+
+    # Convert to simple list
+    trips_with_borough = []
+    for row in results:
+        trips_with_borough.append({
+            'borough': row['Borough'],
+            'total_amount': row['total_amount']
+        })
+
+    # Use CUSTOM GROUPING FUNCTION
+    averages = calculate_average_by_group(trips_with_borough, 'borough', 'total_amount')
+
+    # Format the response
+    result_list = []
+    for borough in averages:
+        result_list.append({
+            'borough': borough,
+            'average_fare': round(averages[borough], 2)
+        })
+
+    return jsonify({
+        "message": "Borough averages calculated with custom algorithm",
+        "algorithm": "Manual grouping and aggregation (not SQL GROUP BY)",
+        "data": result_list
+    })
+
+
+if __name__ == '__main__':
+    print("API Server running at http://127.0.0.1:5000\n")
+    print("--- Utilities and Metadata ---")
+    print("  - GET /api/health")
+    print("  - GET /api/zones")
+    print("\n--- Dashboard Stats ---")
+    print("  - GET /api/stats/summary")
+    print("  - GET /api/stats/charts/boroughs")
+    print("  - GET /api/stats/charts/efficiency")
+    print("  - GET /api/stats/quality")
+    print("\n--- Raw Data and Analytics ---")
+    print("  - GET /api/trips")
+    print("  - GET /api/analytics/summary")
+    print("\n--- Custom Algorithms ---")
+    print("  - GET /api/trips/custom-sort")
+    print("  - GET /api/trips/top-expensive")
+    print("  - GET /api/analytics/borough-custom\n")
+    app.run(debug=True, port=5000)
