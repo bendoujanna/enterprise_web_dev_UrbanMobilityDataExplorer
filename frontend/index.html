@@ -271,3 +271,41 @@
         // API base URL
         const API_BASE = 'http://127.0.0.1:5000/api';
         
+        // Load KPIs
+        function loadKPIs() {
+            // Get summary stats
+            fetch(API_BASE + '/stats/summary')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('total-trips').textContent = data.total_trips.toLocaleString();
+                    document.getElementById('avg-fare').textContent = '$' + data.avg_fare;
+                })
+                .catch(error => {
+                    console.error('Error loading summary:', error);
+                    document.getElementById('total-trips').textContent = 'Error';
+                    document.getElementById('avg-fare').textContent = 'Error';
+                });
+            
+            // Get quality score
+            fetch(API_BASE + '/stats/quality')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('quality-score').textContent = data.overall_score;
+                })
+                .catch(error => {
+                    console.error('Error loading quality:', error);
+                    document.getElementById('quality-score').textContent = 'Error';
+                });
+            
+            // Get analytics summary
+            fetch(API_BASE + '/analytics/summary')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('total-revenue').textContent = data.kpis.total_revenue;
+                })
+                .catch(error => {
+                    console.error('Error loading analytics:', error);
+                    document.getElementById('total-revenue').textContent = 'Error';
+                });
+        }
+        
