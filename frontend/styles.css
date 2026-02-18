@@ -84,3 +84,94 @@ body {
 
 .nav-links li:hover { background-color: rgba(255, 255, 255, 0.1); }
 .nav-links li.active { background-color: rgba(255, 255, 255, 0.2); font-weight: bold; border-left: 4px solid white; }
+
+.theme-switch {
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/*4. Main Content (Scrollable) */
+.content {
+    flex-grow: 1;
+    padding: 2rem;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* View Containers */
+#dashboard-view, #analytics-view, #quality-view {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; /* Vertical Gap between sections */
+    padding-bottom: 2rem;
+}
+
+/*  5. KPI Cards */
+.kpi-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 0.5rem; /* Extra safety margin */
+}
+
+.card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+.kpi .value { font-size: 2rem; font-weight: 700; margin-top: 5px; }
+.kpi h3 { font-size: 0.9rem; color: #888; font-weight: 500; }
+
+#rejected-count-text {
+    color: var(--status-critical);
+    font-weight: bold;
+    background-color: rgba(255, 82, 82, 0.1); /* Light red background */
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+/* 6. Charts */
+.chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    height: 320px;
+    flex-shrink: 0;
+}
+
+#analytics-view .chart-card {
+    height: 550px !important;
+    width: 100%;
+    max-width: 950px;
+    margin: 0 auto;
+    overflow: visible !important;
+    padding-bottom: 40px;
+}
+
+#analytics-view canvas {
+    max-height: 100%;
+    width: 100% !important;
+}
+
+.chart-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chart-card h3 { font-size: 1rem; margin-bottom: 15px; font-weight: 600; }
+.chart-card canvas { flex-grow: 1; height: 0; }
