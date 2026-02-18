@@ -381,4 +381,70 @@
                 .catch(error => console.error('Error loading speed chart:', error));
         }
         
+        // Hourly distribution chart
+        function loadHourlyChart() {
+            fetch(API_BASE + '/analytics/summary')
+                .then(response => response.json())
+                .then(data => {
+                    const ctx = document.getElementById('hourlyChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.chart_data.map(item => item.hour),
+                            datasets: [{
+                                label: 'Trips per Hour',
+                                data: data.chart_data.map(item => item.trips),
+                                borderColor: '#2a5298',
+                                backgroundColor: 'rgba(42, 82, 152, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading hourly chart:', error));
+        }
+        
+        // Revenue chart using custom algorithm
+        function loadRevenueChart() {
+            fetch(API_BASE + '/analytics/borough-custom')
+                .then(response => response.json())
+                .then(data => {
+                    const ctx = document.getElementById('revenueChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.data.map(item => item.borough),
+                            datasets: [{
+                                data: data.data.map(item => item.average_fare),
+                                backgroundColor: [
+                                    '#1e3c72',
+                                    '#2a5298',
+                                    '#4a90e2',
+                                    '#67b7dc',
+                                    '#89c4f4'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading revenue chart:', error));
+        }
+        
         
