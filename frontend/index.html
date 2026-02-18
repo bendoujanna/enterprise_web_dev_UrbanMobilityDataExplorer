@@ -495,4 +495,17 @@
             loadTripsTable();
         }
         
+        // Initialize dashboard when page loads
+        window.onload = function() {
+            console.log('Loading NYC Taxi Dashboard...');
+            loadKPIs();
+            loadBoroughChart();
+            loadSpeedChart();
+            loadHourlyChart();
+            loadRevenueChart();
+            loadTripsTable();
+        };
+    </script>
+</body>
+</html>
         
