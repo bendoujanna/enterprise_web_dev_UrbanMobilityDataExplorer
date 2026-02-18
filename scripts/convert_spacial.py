@@ -31,3 +31,10 @@ def convert_shapefile():
         gdf.to_file(OUTPUT_FILE, driver="GeoJSON")
 
         print("Success! Map data is ready for the Frontend.")
+
+    except Exception as e:
+        print(f"Error during conversion: {e}")
+
+
+if __name__ == "__main__":
+    convert_shapefile()
