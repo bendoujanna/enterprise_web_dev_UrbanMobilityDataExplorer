@@ -308,4 +308,77 @@
                     document.getElementById('total-revenue').textContent = 'Error';
                 });
         }
+
+        // Borough distribution chart
+        function loadBoroughChart() {
+            fetch(API_BASE + '/stats/charts/boroughs')
+                .then(response => response.json())
+                .then(data => {
+                    const ctx = document.getElementById('boroughChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.map(item => item.Borough),
+                            datasets: [{
+                                label: 'Number of Trips',
+                                data: data.map(item => item.trip_count),
+                                backgroundColor: [
+                                    '#1e3c72',
+                                    '#2a5298',
+                                    '#4a90e2',
+                                    '#67b7dc',
+                                    '#89c4f4'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading borough chart:', error));
+        }
+        
+        // Speed efficiency chart
+        function loadSpeedChart() {
+            fetch(API_BASE + '/stats/charts/efficiency')
+                .then(response => response.json())
+                .then(data => {
+                    const ctx = document.getElementById('speedChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.map(item => item.time_of_day),
+                            datasets: [{
+                                label: 'Average Speed (mph)',
+                                data: data.map(item => item.avg_speed),
+                                borderColor: '#1e3c72',
+                                backgroundColor: 'rgba(30, 60, 114, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading speed chart:', error));
+        }
+        
         
