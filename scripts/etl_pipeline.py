@@ -61,3 +61,32 @@ def run_pipeline():
         df['speed_mph'] = (df['trip_distance'] / (df['trip_duration_seconds'] / 3600))
         df['speed_mph'] = df['speed_mph'].replace([np.inf, -np.inf], 0).fillna(0)
         df['average_speed_mph'] = df['speed_mph']
+
+  # suspicious data
+
+        # 1. Fare Outlier / Price Gouging (Fixes $185/0.4mi bug)
+        # Rejects trips that cost more than $50 but went less than 0.5 miles
+        mask_price_anomaly = (df['total_amount'] > 50) & (df['trip_distance'] < 0.5)
+
+        # 2. Impossible Short-Distance Speed
+        # Rejects trips < 1.0 mile with speeds > 30 mph
+        mask_short_speed = (df['trip_distance'] < 1.0) & (df['average_speed_mph'] > 30)
+
+        # 3. Standard Zero Distance/High Fare
+        mask_distance = (df['trip_distance'] <= 0.1) & (df['total_amount'] > 10.0)
+
+        # 4. Negative/Zero Fares
+        mask_fare = df['total_amount'] <= 0
+
+        # 5. Invalid Duration (Negative time or > 12 hours)
+        mask_time = (df['trip_duration_seconds'] <= 0) | (df['trip_duration_seconds'] > 43200)
+
+        # 6. Extreme Speed (> 100 mph overall)
+        mask_speed = (df['average_speed_mph'] > 100) | (df['average_speed_mph'] < 0)
+
+        # 7. Unknown Zones
+        if valid_zones:
+            mask_zone = (~df['PULocationID'].isin(valid_zones)) | \
+                        (~df['DOLocationID'].isin(valid_zones))
+        else:
+            mask_zone = pd.Series([False] * len(df))
