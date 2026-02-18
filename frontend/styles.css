@@ -175,3 +175,71 @@ body {
 
 .chart-card h3 { font-size: 1rem; margin-bottom: 15px; font-weight: 600; }
 .chart-card canvas { flex-grow: 1; height: 0; }
+
+/* 7. Table */
+.table-card {
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.table-wrapper {
+    overflow-y: auto;
+    flex-grow: 1;
+    margin-top: 10px;
+}
+
+table { width: 100%; border-collapse: collapse; }
+th {
+    text-align: left; padding: 12px;
+    border-bottom: 2px solid var(--border-color);
+    color: #888; font-size: 0.85rem; font-weight: 600;
+    position: sticky; top: 0; background: var(--card-bg);
+}
+td { padding: 12px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+
+/* 8. Data Quality Section */
+#quality-view .quality-summary {
+    display: block;
+}
+
+#issue-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-top: 10px;
+}
+
+.quality-item {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 10px;
+    border-left: 6px solid #ccc;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s;
+}
+
+.quality-item:hover { transform: translateY(-2px); }
+
+/* Border Colors*/
+.quality-item.critical { border-left-color: var(--status-critical); }
+.quality-item.warning { border-left-color: var(--status-warning); }
+.quality-item.success { border-left-color: var(--status-success); }
+
+.quality-item span { font-size: 1rem; color: #666; font-weight: 500; }
+
+/* Colored Numbers */
+.quality-item strong { font-size: 2.2rem; margin-top: 10px; color: var(--text-color); }
+.quality-item.critical strong { color: var(--status-critical); }
+.quality-item.warning strong { color: var(--status-warning); }
+.quality-item.success strong { color: var(--status-success); }
+
+.progress-bar {
+    height: 8px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 4px;
+    margin-top: 15px;
+}
