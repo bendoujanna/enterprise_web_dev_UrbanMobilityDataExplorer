@@ -39,3 +39,25 @@ def run_pipeline():
             print(f"Warning: Zone file not found at {ZONE_FILE}. Skipping zone validation.")
     except Exception as e:
         print(f"Zone Error: {e}")
+  
+   # 2. Process Trips
+    print("Processing Data...")
+    try:
+        # Load Data (Adjust for CSV or Parquet)
+        if TRIPS_FILE.endswith('.parquet'):
+            df = pd.read_parquet(TRIPS_FILE)
+        else:
+            df = pd.read_csv(TRIPS_FILE)
+
+        # Precalculations
+        df['tpep_pickup_datetime'] = pd.to_datetime(df['tpep_pickup_datetime'])
+        df['tpep_dropoff_datetime'] = pd.to_datetime(df['tpep_dropoff_datetime'])
+
+        # Calculate Duration (Seconds)
+        df['trip_duration_seconds'] = (df['tpep_dropoff_datetime'] - df['tpep_pickup_datetime']).dt.total_seconds()
+
+        # Calculate Speed (MPH)
+        # Handle division by zero using numpy to avoid crash, then fill NA
+        df['speed_mph'] = (df['trip_distance'] / (df['trip_duration_seconds'] / 3600))
+        df['speed_mph'] = df['speed_mph'].replace([np.inf, -np.inf], 0).fillna(0)
+        df['average_speed_mph'] = df['speed_mph']
