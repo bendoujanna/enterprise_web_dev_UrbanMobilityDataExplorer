@@ -143,3 +143,35 @@ def run_pipeline():
             'improvement_surcharge', 'total_amount', 'congestion_surcharge',
             'trip_duration_seconds', 'average_speed_mph', 'time_of_day'
         ]
+     # Handle missing columns safely
+        for col in cols_to_save:
+            if col not in df_clean.columns:
+                df_clean[col] = 0  # Default value if missing
+        if 'congestion_surcharge' in df_clean.columns:
+            df_clean['congestion_surcharge'] = df_clean['congestion_surcharge'].fillna(0.00)
+
+
+        print("Saving clean data to Database...")
+
+        # Clear old data to verify the filter works
+        conn.execute("DELETE FROM trips")
+
+        # Insert new clean data
+        df_clean[cols_to_save].to_sql('trips', conn, if_exists='append', index=False, chunksize=10000)
+
+        conn.commit()
+        print(f"Success! ETL Completed.")
+        print(f"Total Rows Processed: {len(df)}")
+        print(f"Clean Rows Inserted:  {len(df_clean)}")
+        print(f"Rejected Rows:        {bad_count}")
+
+    except Exception as e:
+        print(f"Pipeline Critical Error: {e}")
+        import traceback
+        traceback.print_exc()
+    finally:
+        conn.close()
+
+
+if __name__ == "__main__":
+    run_pipeline()
