@@ -76,3 +76,41 @@ async function loadAnalytics() {
         renderHourlyChart(data.chart_data);
     }
 }
+// loader
+async function loadQuality() {
+    const data = await API.getQuality();
+    if (data) {
+        document.getElementById('overall-score-large').textContent = data.overall_score;
+        const list = document.getElementById('issue-list');
+
+
+        list.innerHTML = data.detailed_issues.map(issue => `
+            <div class="card quality-item ${issue.status}">
+                <div style="display:flex; justify-content:space-between;">
+                    <span>${issue.issue}</span>
+                    <strong>${issue.count.toLocaleString()}</strong>
+                </div>
+                <div class="progress-bar">
+                    <div style="width: ${Math.min(issue.count / 1000, 100)}%; background: var(--status-${issue.status});"></div>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+// chart renderers
+// function renderBoroughChart(data) {
+//     const ctx = document.getElementById('boroughChart').getContext('2d');
+//     updateChart('borough', ctx, {
+//         type: 'bar',
+//         data: {
+//             labels: data.map(d => d.Borough),
+//             datasets: [{
+//                 label: 'Trips',
+//                 data: data.map(d => d.trip_count),
+//                 backgroundColor: '#4a90e2'
+//             }]
+//         },
+//         options: { indexAxis: 'y', responsive: true }
+//     });
+// }
