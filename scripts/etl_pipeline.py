@@ -124,3 +124,22 @@ def run_pipeline():
             bad_df['rejection_reason'] = np.select(conditions, choices, default='Unknown')
             bad_df.to_csv(LOG_FILE, index=False)
             print(f"  - Logged to {LOG_FILE}")
+
+ # --- D. Filter & Save Clean Data ---
+        df_clean = df[~mask_suspicious].copy()
+
+        # E. Feature Engineering
+        hours = df_clean['tpep_pickup_datetime'].dt.hour
+        df_clean['time_of_day'] = pd.cut(hours,
+                                         bins=[-1, 5, 11, 16, 20, 24],
+                                         labels=['Night', 'Morning', 'Afternoon', 'Evening', 'Night'],
+                                         ordered=False)
+
+        # Ensure columns match DB schema
+        cols_to_save = [
+            'VendorID', 'tpep_pickup_datetime', 'tpep_dropoff_datetime', 'passenger_count',
+            'trip_distance', 'RatecodeID', 'store_and_fwd_flag', 'PULocationID', 'DOLocationID',
+            'payment_type', 'fare_amount', 'extra', 'mta_tax', 'tip_amount', 'tolls_amount',
+            'improvement_surcharge', 'total_amount', 'congestion_surcharge',
+            'trip_duration_seconds', 'average_speed_mph', 'time_of_day'
+        ]
