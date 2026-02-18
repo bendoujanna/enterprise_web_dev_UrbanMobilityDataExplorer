@@ -76,3 +76,25 @@ def create_schema():
             FOREIGN KEY (DOLocationID) REFERENCES zones(LocationID)
         );
     """)
+
+# creating indexes to speed up queries
+    print("Creating indexes...")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_pickup ON trips(PULocationID);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_dropoff ON trips(DOLocationID);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_date ON trips(tpep_pickup_datetime);")
+
+    #  Inserting static data into vendors table
+    print("Seeding vendors...")
+    vendors = [
+        (1, 'Creative Mobile Technologies, LLC'),
+        (2, 'Curb Mobility, LLC')
+    ]
+    cursor.executemany("INSERT OR IGNORE INTO vendors (VendorID, vendor_name) VALUES (?, ?)", vendors)
+
+ # commit changes and close the connection
+    conn.commit()
+    conn.close()
+    print("Database creation and initialization complete.")
+
+if __name__ == "__main__":
+    create_schema()
