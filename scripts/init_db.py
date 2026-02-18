@@ -17,3 +17,10 @@ def create_schema():
         print(f"Created output directory at {OUTPUT_DIR}")
 
     print(f"Initializing database at {DB_PATH}...")
+# connect to the db
+    # URI=True allows us to pass special parameters
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    # enable foreigh keys
+    cursor.execute("PRAGMA foreign_keys = ON;")
