@@ -243,3 +243,57 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); font-size: 0.9
     border-radius: 4px;
     margin-top: 15px;
 }
+
+/* 9. force dropdown */
+
+#borough-filter, #sort-selector, #limit-selector {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 40px 10px 15px; /* Extra right padding for the arrow */
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    min-width: 140px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Hover Effect */
+#borough-filter:hover, #sort-selector:hover, #limit-selector:hover {
+    border-color: var(--primary-blue);
+    background-color: var(--card-bg);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* Focus/active effect */
+#borough-filter:focus, #sort-selector:focus, #limit-selector:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+}
+
+/* Dark mode Overrides  */
+body.dark-mode #borough-filter,
+body.dark-mode #sort-selector,
+body.dark-mode #limit-selector {
+    background-color: #2c2c2c;
+    border-color: #444;
+    color: #e0e0e0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ccc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+body.dark-mode #borough-filter:hover,
+body.dark-mode #sort-selector:hover,
+body.dark-mode #limit-selector:hover {
+    background-color: #383838;
+    border-color: #64b5f6;
+}
