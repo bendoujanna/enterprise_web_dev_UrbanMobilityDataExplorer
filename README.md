@@ -69,8 +69,26 @@ The following strict data quality filters are applied to isolate and drop invali
 
 *Note: Rejected records are not deleted entirely; they are safely exported to `output/suspicious_records.log` alongside their specific rejection reason for further data quality auditing.*
 
+## Database Architecture
+
+The application utilizes **SQLite3** for its lightweight, serverless, and highly portable nature, making it perfect for rapid deployment and academic review. The relational schema is initialized via `scripts/init_db.py` and consists of three interconnected tables:
+
+* **`trips` (Fact Table):** The core table storing all cleaned NYC taxi records. It contains numerical metrics (fares, distances, times) and acts as the central hub for the API queries.
+  
+* **`zones` (Dimension Table):** A spatial lookup table mapping TLC `LocationID`s to their human-readable `Borough` and `Zone` names.
+  
+* **`vendors` (Dimension Table):** A static reference table mapping `VendorID`s to their corporate entities (e.g., Creative Mobile Technologies, Curb Mobility).
+
+### Query Optimization
+
+To ensure the Flask API remains highly responsive when aggregating millions of rows for the frontend dashboard, the database schema includes targeted indexing:
+* `idx_pickup` & `idx_dropoff`: Accelerates spatial filtering and geographic aggregations.
+  
+* `idx_date`: Speeds up time-series analytics (e.g., calculating average speeds by time of day).
+
 
 # Prerequisites
+
 To run this application, you will need:
 
 - Python 3.8+ installed on your machine.
@@ -187,7 +205,7 @@ The frontend is completely decoupled from the Flask backend. To view the dashboa
 
 ## Technology Stack
 
-* **Frontend:** HTML5, CSS3 (Dark Mode Supported), Vanilla JavaScript, Chart.js
+* **Frontend:** HTML5, CSS, Vanilla JavaScript, Chart.js
   
 * **Backend:** Python, Flask, Flask-CORS
   
