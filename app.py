@@ -144,3 +144,88 @@ def get_analytics_summary():
         })
     finally:
         conn.close()
+
+app.route('/api/stats/quality', methods=['GET'])
+def get_data_quality():
+    conn = get_db_connection()
+    try:
+        # 1. Get Valid Records
+        valid_records = conn.execute("SELECT COUNT(*) FROM trips").fetchone()[0]
+
+        # 2. Get Rejected Records
+        log_path = os.path.join(BASE_DIR, 'output', 'suspicious_records.log')
+
+        # Debugging
+        print(f"DEBUG: Looking for log at {log_path}")
+
+        rejected_records = 0
+        issues = []
+
+        if os.path.exists(log_path):
+            try:
+                # Read the log file
+                df_log = pd.read_csv(log_path)
+                rejected_records = len(df_log)
+
+                # Count by specific reason
+                counts = df_log['rejection_reason'].value_counts()
+
+                # Map the log counts to the Dashboard format
+                issues = [
+                    {
+                        "issue": "Fare Outliers (Short Trip)",
+                        "count": int(counts.get('Fare Outlier (Short Trip)', 0)),
+                        "status": "critical"
+                    },
+                    {
+                        "issue": "Impossible Short Speeds",
+                        "count": int(counts.get('Impossible Short Speed', 0)),
+                        "status": "critical"
+                    },
+                    {
+                        "issue": "Zero Dist/High Fare",
+                        "count": int(counts.get('Zero Distance/High Fare', 0)),
+                        "status": "critical"
+                    },
+                    {
+                        "issue": "Negative/Zero Fares",
+                        "count": int(counts.get('Negative/Zero Fare', 0)),
+                        "status": "critical"
+                    },
+                    {
+                        "issue": "Invalid Durations",
+                        "count": int(counts.get('Invalid Duration', 0)),
+                        "status": "warning"
+                    },
+                    {
+                        "issue": "Extreme Speed (>100mph)",
+                        "count": int(counts.get('Extreme Speed', 0)),
+                        "status": "warning"
+                    },
+                    {
+                        "issue": "Unknown Zones",
+                        "count": int(counts.get('Unknown Zone', 0)),
+                        "status": "success"
+                    }
+                ]
+            except Exception as e:
+                print(f"Error reading log file: {e}")
+                # Fallback if file is corrupt
+                issues = [{"issue": "Error reading log", "count": 0, "status": "critical"}]
+        else:
+            # Fallback if ETL hasn't run yet
+            issues = [{"issue": "Log file not found", "count": 0, "status": "warning"}]
+
+        # 3. Calculate Score
+        total_attempted = valid_records + rejected_records
+        quality_score = round((valid_records / total_attempted) * 100, 2) if total_attempted > 0 else 0
+
+        return jsonify({
+            "overall_score": f"{quality_score}%",
+            "valid_records": valid_records,
+            "rejected_records": rejected_records,
+            "detailed_issues": issues,
+            "last_updated": "Real-time from ETL Logs"
+        })
+    finally:
+        conn.close()
