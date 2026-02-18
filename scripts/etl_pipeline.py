@@ -90,3 +90,37 @@ def run_pipeline():
                         (~df['DOLocationID'].isin(valid_zones))
         else:
             mask_zone = pd.Series([False] * len(df))
+    # Combine all masks including the rules
+        mask_suspicious = (mask_price_anomaly | mask_short_speed | mask_distance |
+                           mask_fare | mask_time | mask_speed | mask_zone)
+
+        # Log suspicious records
+        bad_count = mask_suspicious.sum()
+        if bad_count > 0:
+            print(f"Found {bad_count} suspicious records.")
+            bad_df = df[mask_suspicious].copy()
+
+            # Updated labels to reflect the logic
+            conditions = [
+                mask_price_anomaly[mask_suspicious],
+                mask_short_speed[mask_suspicious],
+                mask_distance[mask_suspicious],
+                mask_fare[mask_suspicious],
+                mask_speed[mask_suspicious],
+                mask_time[mask_suspicious],
+                mask_zone[mask_suspicious]
+            ]
+
+            choices = [
+                'Fare Outlier (Short Trip)',
+                'Impossible Short Speed',
+                'Zero Distance/High Fare',
+                'Negative/Zero Fare',
+                'Extreme Speed',
+                'Invalid Duration',
+                'Unknown Zone'
+            ]
+
+            bad_df['rejection_reason'] = np.select(conditions, choices, default='Unknown')
+            bad_df.to_csv(LOG_FILE, index=False)
+            print(f"  - Logged to {LOG_FILE}")
