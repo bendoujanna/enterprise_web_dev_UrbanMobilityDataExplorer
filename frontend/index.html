@@ -205,3 +205,69 @@
                 <div class="value" id="total-revenue">Loading...</div>
             </div>
         </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <h2>Filter Data</h2>
+            <div class="filter-group">
+                <label>Borough:</label>
+                <select id="borough-filter">
+                    <option value="">All Boroughs</option>
+                    <option value="Manhattan">Manhattan</option>
+                    <option value="Brooklyn">Brooklyn</option>
+                    <option value="Queens">Queens</option>
+                    <option value="Bronx">Bronx</option>
+                    <option value="Staten Island">Staten Island</option>
+                </select>
+                <button onclick="applyFilters()">Apply Filter</button>
+                <button onclick="resetFilters()">Reset</button>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="chart-section">
+            <div class="chart-container">
+                <h2>Trip Distribution by Borough</h2>
+                <canvas id="boroughChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Average Speed by Time of Day</h2>
+                <canvas id="speedChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-container">
+                <h2>Hourly Trip Distribution</h2>
+                <canvas id="hourlyChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Revenue by Borough</h2>
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="data-table">
+            <h2>Most Expensive Trips (Custom Sorted)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Trip ID</th>
+                        <th>Pickup Time</th>
+                        <th>Distance (mi)</th>
+                        <th>Fare ($)</th>
+                        <th>Speed (mph)</th>
+                    </tr>
+                </thead>
+                <tbody id="trips-tbody">
+                    <tr><td colspan="5" class="loading">Loading trips data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // API base URL
+        const API_BASE = 'http://127.0.0.1:5000/api';
+        
