@@ -16,7 +16,8 @@ def convert_shapefile():
         print(f"Error: Could not find Shapefile at {SHP_FILE}")
         print(" Make sure you moved the 'taxi_zones' folder into 'data'")
         return
- try:
+
+    try:
         # Read the Shapefile
         print("   Reading Shapefile...")
         gdf = gpd.read_file(SHP_FILE)
