@@ -16,7 +16,7 @@ A full-stack web application and custom ETL pipeline designed to process, analyz
 
 ## Project structure
 
-`
+```
 enterprise_web_dev_UrbanMobilityDataExplorer/
 │
 ├── frontend/                   # Frontend UI and logic
@@ -45,7 +45,7 @@ enterprise_web_dev_UrbanMobilityDataExplorer/
 ├── algorithms.py               # Custom sorting and grouping algorithms
 ├── requirements.txt            # Python dependencies
 └── .gitignore                  # Git configuration
-`
+```
 
 ## Data Cleaning & Preprocessing
 
