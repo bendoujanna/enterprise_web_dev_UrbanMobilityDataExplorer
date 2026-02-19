@@ -208,7 +208,7 @@ async function loadTripsTable(borough = '', sortBy = 'total_amount') {
     tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Processing Manual Sort...</td></tr>';
 
     //  Call API
-    const res = await API.getSortedTrips(sortBy, 50, borough);
+    const res = await API.getSortedTrips(sortBy, 100, borough);
 
     // Render Rows
     if (res && res.data) {
