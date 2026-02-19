@@ -285,8 +285,8 @@ The frontend is completely decoupled from the Flask backend. To view the dashboa
 
 * **Dataset:** The trip data and zone lookup tables are provided by the [NYC Taxi and Limousine Commission (TLC)](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
 
-## Youtube link
-https://www.youtube.com/watch?si=77lg0q6yG_hUA4ax&v=7OYRO_0pdiw&feature=youtu.be
+## video link
+https://www.loom.com/share/4c8ab46842994590887dfbfc228cd273
 
 
 ## Contributors 
