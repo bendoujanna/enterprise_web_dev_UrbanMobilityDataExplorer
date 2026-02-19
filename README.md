@@ -16,7 +16,8 @@ A full-stack web application and custom ETL pipeline designed to process, analyz
 
 ## Project structure
 
-`enterprise_web_dev_UrbanMobilityDataExplorer/
+`
+enterprise_web_dev_UrbanMobilityDataExplorer/
 │
 ├── frontend/                   # Frontend UI and logic
 │   ├── index.html              # Main dashboard view
@@ -43,11 +44,20 @@ A full-stack web application and custom ETL pipeline designed to process, analyz
 ├── app.py                      # Flask Application entry point
 ├── algorithms.py               # Custom sorting and grouping algorithms
 ├── requirements.txt            # Python dependencies
-└── .gitignore                  # Git configuration`
+└── .gitignore                  # Git configuration
+`
 
 ## Data Cleaning & Preprocessing
 
 Real-world taxi data contains significant noise and anomalies. Our Extract, Transform, Load (ETL) pipeline (`scripts/etl_pipeline.py`) automatically sanitizes the dataset before loading it into the SQLite database. 
+
+### 1. Data Integration & Normalization
+
+* **Data Integration:** The pipeline systematically loads the highly compressed `.parquet` trip data and programmatically associates it with spatial metadata from `taxi_zone_lookup.csv` via relational mapping.
+  
+* **Normalization:** Standardizes all temporal data (`tpep_pickup_datetime`, `tpep_dropoff_datetime`) into strictly formatted datetime objects, sanitizes numeric fields (e.g., handling missing `congestion_surcharge` values by filling with `$0.00`), and aligns categorical identifiers for database storage.
+
+###  2. Data Integrity (Anomaly Filtering)
 
 The following strict data quality filters are applied to isolate and drop invalid or physically impossible trips:
 
@@ -67,7 +77,20 @@ The following strict data quality filters are applied to isolate and drop invali
   
 * **Missing Value Handling:** Fills missing `congestion_surcharge` values with $0.00 and safely handles division-by-zero errors during speed calculations.
 
-*Note: Rejected records are not deleted entirely; they are safely exported to `output/suspicious_records.log` alongside their specific rejection reason for further data quality auditing.*
+
+### 3. Feature Engineering
+
+To provide deeper insights into urban movement and economics, we engineered **three derived features** from the raw columns:
+
+1. **`trip_duration_seconds`**: Calculated by subtracting the pickup timestamp from the dropoff timestamp. *Justification:* Raw timestamps alone cannot easily be aggregated; this metric is essential for calculating traffic delays and route efficiency.
+  
+2. **`average_speed_mph`**: Calculated by dividing `trip_distance` by the derived duration. *Justification:* Acts as the primary indicator of urban congestion and physical outliers (detecting impossible speeds). Includes safety checks for division-by-zero errors.
+  
+3. **`time_of_day`**: Categorically bins the pickup hour into distinct periods (Morning, Afternoon, Evening, Night). *Justification:* Allows the dashboard to perform macro-level temporal analysis of demand patterns without getting bogged down by minute-by-minute variance.
+
+### 4. Transparency and Auditing
+
+Rejected records are not deleted entirely; they are safely exported to `output/suspicious_records.log` alongside their specific rejection reason for further data quality auditing.
 
 ## Database Architecture
 
@@ -85,6 +108,74 @@ To ensure the Flask API remains highly responsive when aggregating millions of r
 * `idx_pickup` & `idx_dropoff`: Accelerates spatial filtering and geographic aggregations.
   
 * `idx_date`: Speeds up time-series analytics (e.g., calculating average speeds by time of day).
+
+  ## Custom Algorithmic Processing
+
+To demonstrate a deep understanding of core data structures and computational efficiency, this project purposefully bypasses standard database-level operations (such as SQL `ORDER BY` or `GROUP BY`) for specific analytical API endpoints. Instead, the data is fetched and processed in-memory using custom Python algorithms located in `algorithms.py`.
+
+* **Manual Sorting Algorithms:** Implemented custom sorting logic (e.g., Bubble Sort) to dynamically order trip arrays by Fare, Distance, or Speed. This allows the backend to handle complex, multi-variable sorting requirements before passing the JSON payload to the frontend.
+  
+* **In-Memory Grouping & Aggregation:** Utilizes hash maps (Python dictionaries) to manually iterate through records, grouping trips by spatial zones and calculating aggregate metrics (like total revenue or average speed) without relying on native SQL aggregate functions.
+  
+* **Top-N Selection:** Implements a custom iterative algorithm to scan the dataset and extract the top-most expensive trips, ensuring optimal memory management when handling large collections of data.
+
+# Key API Endpoints
+
+**Utilities & Metadata**
+
+* `GET /api/health` - API status and DB connection check
+  
+* `GET /api/zones` - Spatial metadata mapping (LocationIDs to Boroughs)
+
+**Dashboard Statistics**
+
+* `GET /api/stats/summary` - Total trips and average fare
+
+* `GET /api/stats/charts/boroughs` - Aggregate trips per borough
+  
+* `GET /api/stats/charts/efficiency` - Average speed by time of day
+  
+* `GET /api/stats/quality` - Data quality metrics and rejected records
+
+**Raw Data & Analytics**
+
+* `GET /api/trips` - Raw trip records (paginated)
+  
+* `GET /api/analytics/summary` - Revenue, duration, and peak hours
+
+**Custom Algorithms (Project Requirements)**
+
+* `GET /api/trips/custom-sort` - Custom manual sorting
+  
+* `GET /api/trips/top-expensive` - Custom top-N selection algorithm
+  
+* `GET /api/analytics/borough-custom` - Custom grouping and aggregation
+
+## Frontend Dashboard Development
+
+The user interface is a custom-built, responsive web dashboard engineered strictly with **HTML, CSS, and Vanilla JavaScript**, fulfilling all core project requirements without relying on heavy external JS frameworks.
+
+ **1. Dynamic Interaction and Data Visualization**
+
+The dashboard is built as a Single Page Application (SPA) that allows users to seamlessly interact with the dataset:
+
+* **Visual Summaries:** The main view provides instant, dynamically calculated KPIs (Total Trips, Average Fare, Data Quality Score) and responsive charts (via Chart.js) visualizing Borough Demand and Average Speed over time.
+  
+* **Detail Views:** Users can toggle between the main dashboard, an Advanced Analytics view (revenue/duration metrics and peak hours), and a dedicated Data Quality breakdown.
+
+**2. Advanced Filtering and Sorting**
+
+The application features built-in controls that trigger our custom backend algorithms to manipulate the raw data table:
+
+* **Location Filtering:** Users can instantly filter the raw trip records by specific geographical zones (e.g., Manhattan, Brooklyn, Queens, Bronx, EWR, Staten Island).
+  
+* **Custom Sorting:** Users can reorder the detailed view on the fly, sorting trips by **Fare** (`total_amount`), **Distance** (`trip_distance`), or **Speed** (MPH).
+
+**3. Responsive and Accessible UI**
+
+* Features a fully responsive CSS Flexbox/Grid architecture with media queries that safely stack components and allow horizontal table scrolling on mobile devices.
+  
+* Includes a dynamic Dark/Light mode toggle that updates CSS root variables and chart themes for better accessibility.
 
 
 # Prerequisites
@@ -170,37 +261,6 @@ The frontend is completely decoupled from the Flask backend. To view the dashboa
 
 - The dashboard will automatically fetch data from the local Flask API.
 
-# Key API Endpoints
-
-**Utilities & Metadata**
-
-* `GET /api/health` - API status and DB connection check
-  
-* `GET /api/zones` - Spatial metadata mapping (LocationIDs to Boroughs)
-
-**Dashboard Statistics**
-
-* `GET /api/stats/summary` - Total trips and average fare
-
-* `GET /api/stats/charts/boroughs` - Aggregate trips per borough
-  
-* `GET /api/stats/charts/efficiency` - Average speed by time of day
-  
-* `GET /api/stats/quality` - Data quality metrics and rejected records
-
-**Raw Data & Analytics**
-
-* `GET /api/trips` - Raw trip records (paginated)
-  
-* `GET /api/analytics/summary` - Revenue, duration, and peak hours
-
-**Custom Algorithms (Project Requirements)**
-
-* `GET /api/trips/custom-sort` - Custom manual sorting
-  
-* `GET /api/trips/top-expensive` - Custom top-N selection algorithm
-  
-* `GET /api/analytics/borough-custom` - Custom grouping and aggregation
 
 
 ## Technology Stack
