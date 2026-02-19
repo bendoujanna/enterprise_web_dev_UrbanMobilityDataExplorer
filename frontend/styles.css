@@ -148,7 +148,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
-    height: 320px;
+    height: auto;
     flex-shrink: 0;
 }
 
@@ -174,7 +174,6 @@ body {
 }
 
 .chart-card h3 { font-size: 1rem; margin-bottom: 15px; font-weight: 600; }
-.chart-card canvas { flex-grow: 1; height: 0; }
 
 /* 7. Table */
 .table-card {
@@ -297,14 +296,80 @@ body.dark-mode #limit-selector:hover {
     background-color: #383838;
     border-color: #64b5f6;
 }
-/* Mobile */
+
+/* Tablet AND smaller Desktop (1024px and below) */
 @media (max-width: 1024px) {
-    body { overflow: auto; height: auto; }
-    .app-wrapper { flex-direction: column; height: auto; }
-    .sidebar { width: 100%; height: auto; padding: 1rem; flex-direction: row; align-items: center; }
-    .nav-links { flex-direction: row; margin: 0; }
-    .content { height: auto; overflow: visible; padding: 1rem; gap: 1rem; }
-    .chart-grid { grid-template-columns: 1fr; height: auto; }
-    .kpi-row { grid-template-columns: 1fr; }
-    #analytics-view .chart-card { max-width: 100%; }
+    body, .app-wrapper, .content {
+        height: auto;
+        overflow: visible;
+    }
+
+    .app-wrapper {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 1rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .nav-links {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin: 15px 0;
+        width: 100%;
+    }
+
+    .content {
+        padding: 1rem;
+        gap: 1.5rem;
+    }
+
+    .chart-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    #analytics-view .chart-card {
+        max-width: 100%;
+    }
+
+    .table-card {
+        overflow-x: auto;
+        max-width: 100vw;
+    }
+
+    table {
+        min-width: 800px;
+    }
+}
+
+/* Mobile Phones (768px and below) */
+@media (max-width: 768px) {
+    .kpi-row {
+        display: flex;
+        flex-direction: column;
+    }
+    .table-card > div {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 15px;
+    }
+    #borough-filter, #sort-selector {
+        width: 100%;
+    }
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 300px;
+    min-height: 300px;
+    width: 100%;
 }
