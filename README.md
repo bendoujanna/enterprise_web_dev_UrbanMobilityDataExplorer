@@ -114,6 +114,54 @@ To ensure the Flask API remains highly responsive when aggregating millions of r
   
 * `idx_date`: Speeds up time-series analytics (e.g., calculating average speeds by time of day).
 
+## Database schema
+
+    PRAGMA foreign_keys = ON;
+    
+    CREATE TABLE IF NOT EXISTS vendors (
+       VendorID INTEGER PRIMARY KEY,
+       vendor_name TEXT NOT NULL
+    );
+    
+    CREATE TABLE IF NOT EXISTS zones (
+        LocationID INTEGER PRIMARY KEY,
+        Borough TEXT,
+        Zone TEXT,
+        service_zone TEXT       
+    );
+    
+    CREATE TABLE IF NOT EXISTS trips (
+        trip_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        VendorID INTEGER NOT NULL,
+        PULocationID INTEGER,
+        DOLocationID INTEGER,
+        tpep_pickup_datetime TEXT,
+        tpep_dropoff_datetime TEXT,
+        passenger_count INTEGER,
+        trip_distance DECIMAL(10, 2),
+        RatecodeID INTEGER,
+        store_and_fwd_flag TEXT,
+        payment_type INTEGER,
+        fare_amount DECIMAL(10, 2),
+        extra DECIMAL(10,2),
+        mta_tax DECIMAL(10,2),
+        tip_amount DECIMAL(10, 2),
+        tolls_amount DECIMAL(10,2),
+        improvement_surcharge DECIMAL(10,2),
+        total_amount DECIMAL(10, 2),
+        congestion_surcharge DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        trip_duration_seconds INTEGER,
+        average_speed_mph DECIMAL(10,2),
+        time_of_day TEXT,
+        FOREIGN KEY (VendorID) REFERENCES vendors(VendorID),
+        FOREIGN KEY (PULocationID) REFERENCES zones(LocationID),
+        FOREIGN KEY (DOLocationID) REFERENCES zones(LocationID)
+    );
+    
+    CREATE INDEX IF NOT EXISTS idx_pickup ON trips(PULocationID);
+    CREATE INDEX IF NOT EXISTS idx_dropoff ON trips(DOLocationID);
+    CREATE INDEX IF NOT EXISTS idx_date ON trips(tpep_pickup_datetime);
+
   ## Custom Algorithmic Processing
 
 To demonstrate a deep understanding of core data structures and computational efficiency, this project purposefully bypasses standard database-level operations (such as SQL `ORDER BY` or `GROUP BY`) for specific analytical API endpoints. Instead, the data is fetched and processed in-memory using custom Python algorithms located in `algorithms.py`.
@@ -297,56 +345,7 @@ https://docs.google.com/spreadsheets/d/1rM1W1w6Jr3aj3OJ7ED7FgRfbUuQBZ_Z0T-EkieM8
 
 [UrbanMobilityDataExplorer.zip](https://github.com/user-attachments/files/25428723/UrbanMobilityDataExplorer.zip)
 
-## database schemas
 
-
-
-
-[UploaPRAGMA foreign_keys = ON;
-
-CREATE TABLE IF NOT EXISTS vendors (
-   VendorID INTEGER PRIMARY KEY,
-   vendor_name TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS zones (
-    LocationID INTEGER PRIMARY KEY,
-    Borough TEXT,
-    Zone TEXT,
-    service_zone TEXT       
-);
-
-CREATE TABLE IF NOT EXISTS trips (
-    trip_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    VendorID INTEGER NOT NULL,
-    PULocationID INTEGER,
-    DOLocationID INTEGER,
-    tpep_pickup_datetime TEXT,
-    tpep_dropoff_datetime TEXT,
-    passenger_count INTEGER,
-    trip_distance DECIMAL(10, 2),
-    RatecodeID INTEGER,
-    store_and_fwd_flag TEXT,
-    payment_type INTEGER,
-    fare_amount DECIMAL(10, 2),
-    extra DECIMAL(10,2),
-    mta_tax DECIMAL(10,2),
-    tip_amount DECIMAL(10, 2),
-    tolls_amount DECIMAL(10,2),
-    improvement_surcharge DECIMAL(10,2),
-    total_amount DECIMAL(10, 2),
-    congestion_surcharge DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-    trip_duration_seconds INTEGER,
-    average_speed_mph DECIMAL(10,2),
-    time_of_day TEXT,
-    FOREIGN KEY (VendorID) REFERENCES vendors(VendorID),
-    FOREIGN KEY (PULocationID) REFERENCES zones(LocationID),
-    FOREIGN KEY (DOLocationID) REFERENCES zones(LocationID)
-);
-
-CREATE INDEX IF NOT EXISTS idx_pickup ON trips(PULocationID);
-CREATE INDEX IF NOT EXISTS idx_dropoff ON trips(DOLocationID);
-CREATE INDEX IF NOT EXISTS idx_date ON trips(tpep_pickup_datetime);ding schema.sql…](schema)
 
 ## Contributors 
 
