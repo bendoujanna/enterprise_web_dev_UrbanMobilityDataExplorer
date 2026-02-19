@@ -1,4 +1,4 @@
-[schema.sql](https://github.com/user-attachments/files/25428763/schema.sql)# **Urban Mobility Data Explorer**
+# **Urban Mobility Data Explorer**
 
 
 A full-stack web application and custom ETL pipeline designed to process, analyze, and visualize New York City Yellow Taxi trip data (TLC Dataset). This project features a Python/Flask backend, custom sorting and grouping algorithms, and an interactive frontend dashboard.
@@ -345,6 +345,8 @@ https://docs.google.com/spreadsheets/d/1rM1W1w6Jr3aj3OJ7ED7FgRfbUuQBZ_Z0T-EkieM8
 
 [UrbanMobilityDataExplorer.zip](https://github.com/user-attachments/files/25428723/UrbanMobilityDataExplorer.zip)
 
+**database schemas**
+[schema.sql](https://github.com/user-attachments/files/25428763/schema.sql)
 
 
 ## Contributors 
